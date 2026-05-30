@@ -22,11 +22,16 @@ import com.example.HR_management.usermanagement.dto.UserResponse;
 import com.example.HR_management.usermanagement.entity.User;
 import com.example.HR_management.usermanagement.service.UserManagementService;
 
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 
 @RestController
 @RequestMapping("/users")
 @Validated
+@Tag(name = "User Management", description = "Protected APIs for managing users")
+@SecurityRequirement(name = "bearerAuth")
 public class UserManagementController {
 
     private final UserManagementService userManagementService;
@@ -36,30 +41,35 @@ public class UserManagementController {
     }
 
     @GetMapping("/me")
+    @Operation(summary = "Get current user", description = "Returns the profile of the currently authenticated user")
     public ResponseEntity<UserResponse> getCurrentUser(@AuthenticationPrincipal User currentUser) {
         return ResponseEntity.ok(userManagementService.getCurrentUser(currentUser));
     }
 
     @PreAuthorize("hasAnyRole('HR', 'MANAGER')")
     @GetMapping
+    @Operation(summary = "Get all users", description = "Returns all users. Accessible to HR and Manager roles")
     public ResponseEntity<List<UserResponse>> getAllUsers() {
         return ResponseEntity.ok(userManagementService.getAllUsers());
     }
 
     @PreAuthorize("hasAnyRole('HR', 'MANAGER')")
     @GetMapping("/{id}")
+    @Operation(summary = "Get user by id", description = "Returns a single user by id. Accessible to HR and Manager roles")
     public ResponseEntity<UserResponse> getUserById(@PathVariable Long id) {
         return ResponseEntity.ok(userManagementService.getUserById(id));
     }
 
     @PreAuthorize("hasAnyRole('HR', 'MANAGER')")
     @PostMapping
+    @Operation(summary = "Create user", description = "Creates a new user. Accessible to HR and Manager roles")
     public ResponseEntity<UserResponse> createUser(@Valid @RequestBody CreateUserRequest request) {
         return ResponseEntity.status(HttpStatus.CREATED).body(userManagementService.createUser(request));
     }
 
     @PreAuthorize("hasAnyRole('HR', 'MANAGER')")
     @PutMapping("/{id}")
+    @Operation(summary = "Update user", description = "Updates an existing user. Accessible to HR and Manager roles")
     public ResponseEntity<UserResponse> updateUser(
             @PathVariable Long id,
             @Valid @RequestBody UpdateUserRequest request
@@ -69,6 +79,7 @@ public class UserManagementController {
 
     @PreAuthorize("hasAnyRole('HR', 'MANAGER')")
     @DeleteMapping("/{id}")
+    @Operation(summary = "Delete user", description = "Deletes a user by id. Accessible to HR and Manager roles")
     public ResponseEntity<Void> deleteUser(@PathVariable Long id) {
         userManagementService.deleteUser(id);
         return ResponseEntity.noContent().build();

@@ -13,11 +13,14 @@ import com.example.HR_management.auth.dto.LoginRequest;
 import com.example.HR_management.auth.dto.RegisterRequest;
 import com.example.HR_management.auth.service.AuthService;
 
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 
 @RestController
 @RequestMapping("/auth")
 @Validated
+@Tag(name = "Authentication", description = "Authentication APIs for registration and login")
 public class AuthController {
 
     private final AuthService authService;
@@ -27,11 +30,13 @@ public class AuthController {
     }
 
     @PostMapping("/register")
+    @Operation(summary = "Register a new user", description = "Creates a new employee user and returns a JWT access token")
     public ResponseEntity<AuthResponse> register(@Valid @RequestBody RegisterRequest request) {
         return ResponseEntity.status(HttpStatus.CREATED).body(authService.register(request));
     }
 
     @PostMapping("/login")
+    @Operation(summary = "Login user", description = "Authenticates an existing user and returns a JWT access token")
     public ResponseEntity<AuthResponse> login(@Valid @RequestBody LoginRequest request) {
         return ResponseEntity.ok(authService.login(request));
     }
